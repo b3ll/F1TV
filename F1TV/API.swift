@@ -18,8 +18,8 @@ let systemId = "60a9ad84-e93d-480f-80d6-af37494f2e22"
 let socialAuthenticate = "https://f1tv.formula1.com/api/social-authenticate/"
 let identityProvider = "/api/identity-providers/iden_732298a17f9c458890a1877880d140f3/"
 
-let accountAPI = "https://api.formula1.com/v1/account/"
-let accountCreateSession = accountAPI + "Subscriber/CreateSession"
+let accountAPI = "https://api.formula1.com/v2/account/"
+let accountCreateSession = accountAPI + "subscriber/authenticate/by-password"
 
 let F1TVAPIBaseV1: URL = URL(string: "https://f1tv.formula1.com")!
 
