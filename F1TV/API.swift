@@ -87,6 +87,7 @@ class F1TV {
         "Content-Type": "application/json",
         "apikey": apiKey,
         "cd-systemid": systemId,
+        "User-Agent": "RaceControl",
     ]
 
     // MARK: - Login
