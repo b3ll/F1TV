@@ -88,6 +88,7 @@ class F1TV {
         "apikey": apiKey,
         "cd-systemid": systemId,
         "User-Agent": "RaceControl",
+        "accept-language": "en",
     ]
 
     // MARK: - Login
