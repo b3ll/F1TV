@@ -89,6 +89,7 @@ class F1TV {
         "cd-systemid": systemId,
         "User-Agent": "RaceControl",
         "accept-language": "en",
+        "Last-Modified": ""
     ]
 
     // MARK: - Login
@@ -348,11 +349,11 @@ class F1TV {
         //            }
     }
 
-    private func get(_ URL: URL, parameters: [String: String]?) -> some DataRequest {
+    func get(_ URL: URL, parameters: [String: String]?) -> some DataRequest {
         return AF.request(URL, method: .get, parameters: parameters, encoder: URLEncodedFormParameterEncoder.default, headers: HTTPHeaders(headers))
     }
 
-    private func post(_ URL: URL, parameters: [String: String]?) -> some DataRequest {
+    func post(_ URL: URL, parameters: [String: String]?) -> some DataRequest {
         return AF.request(URL, method: .post, parameters: parameters, encoder: JSONParameterEncoder.default, headers: HTTPHeaders(headers))
     }
 
@@ -431,9 +432,14 @@ struct SeasonsResponse: Codable {
 
 }
 
+// TODO: split ViewModels and DAOs for v1 and v2 API
 struct Event: Codable, Hashable {
 
-    let URL: String
+    // TODO: Streamline this once fully switching to one API version.
+    //       If the pageId is set it's using the v2 API and if the URL is present it should go to the v1 API.
+    let pageId: Int?
+    let URL: String?
+
     let name: String
     let imageURLs: [Image]
     let startDate: String
@@ -442,7 +448,30 @@ struct Event: Codable, Hashable {
     let sessions: [Session]?
     let nation: Nation?
 
+    init(
+        pageId: Int? = nil,
+        URL: String? = nil,
+        name: String,
+        imageURLs: [Image],
+        startDate: String,
+        endDate: String,
+        officialName: String,
+        sessions: [Session]? = nil,
+        nation: Nation? = nil
+    ) {
+        self.pageId = pageId
+        self.URL = URL
+        self.name = name
+        self.imageURLs = imageURLs
+        self.startDate = startDate
+        self.endDate = endDate
+        self.officialName = officialName
+        self.sessions = sessions
+        self.nation = nation
+    }
+
     enum CodingKeys: String, CodingKey {
+        case pageId
         case name
         case URL = "self"
         case imageURLs = "image_urls"
