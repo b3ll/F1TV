@@ -105,18 +105,38 @@ class F1TV {
                 return
             }
 
-            self?._authorize(subscriptionData: subscriptionData) { (authorized) in
-                completion(authorized)
-            }
+            print("[log] login completed")
+            self?.updateHeaders(with: session!.subscriptionData!.subscriptionToken)
+//            self?._authorize(subscriptionData: subscriptionData) { (authorized) in
+//                completion(authorized)
+//            }
         }
     }
 
     private func _login(username: String, password: String, completion: ((AccountSession?) -> Void)? ) {
-        let login = ["Login": username,
-                     "Password": password]
-        AF.request(accountCreateSession, method: .post, parameters: login, encoder: JSONParameterEncoder.default, headers: HTTPHeaders(headers)).responseData { (response) in
+        let login = [
+            "DeviceType": "16",
+            "DistributionChannel": "871435e3-2d31-4d4f-9004-96c6a8011656",
+            "Language": "en-GB",
+            "Login": username,
+            "Password": password
+        ]
+        let authHeaders = [
+             "Content-Type": "application/json",
+             "apikey": apiKey,
+             "CD-DeviceType": "16",
+             "CD-DistributionChannel": "871435e3-2d31-4d4f-9004-96c6a8011656",
+             "User-Agent": "RaceControl"
+        ]
+        AF.request(
+            accountCreateSession,
+            method: .post,
+            parameters: login,
+            encoder: JSONParameterEncoder.default,
+            headers: HTTPHeaders(authHeaders)
+        ).responseData { (response) in
             guard let data = response.data else {
-                print("login failed")
+                print("[Error] login failed")
                 completion?(nil)
                 return
             }
@@ -132,34 +152,39 @@ class F1TV {
         }
     }
 
-    private func _authorize(subscriptionData: SubscriptionData, completion: ((Bool) -> Void)?) {
-        let params = ["identity_provider_url": identityProvider,
-                      "access_token": subscriptionData.subscriptionToken]
-        AF.request(socialAuthenticate, method: .post, parameters: params, encoder: JSONParameterEncoder.default, headers: HTTPHeaders(headers)).responseData { [weak self] (response) in
-            guard let data = response.data else {
-                print("authorization failed")
-                completion?(false)
-                return
-            }
-
-            let decoder = JSONDecoder()
-            do {
-                let authorization = try decoder.decode(AuthorizationData.self, from: data)
-                self?.updateHeaders(with: authorization)
-                completion?(true)
-            } catch {
-                print(error)
-                completion?(false)
-            }
-        }
-    }
+//    private func _authorize(subscriptionData: SubscriptionData, completion: ((Bool) -> Void)?) {
+//        let params = ["identity_provider_url": identityProvider,
+//                      "access_token": subscriptionData.subscriptionToken]
+//        AF.request(socialAuthenticate, method: .post, parameters: params, encoder: JSONParameterEncoder.default, headers: HTTPHeaders(headers)).responseData { [weak self] (response) in
+//            guard let data = response.data else {
+//                print("authorization failed")
+//                completion?(false)
+//                return
+//            }
+//
+//            let decoder = JSONDecoder()
+//            do {
+//                let authorization = try decoder.decode(AuthorizationData.self, from: data)
+//                self?.updateHeaders(with: authorization)
+//                completion?(true)
+//            } catch {
+//                print(error)
+//                completion?(false)
+//            }
+//        }
+//    }
 
     var loggedInAndAuthorized: Bool {
         return headers["Authorization"] != nil
     }
 
-    private func updateHeaders(with authorizationData: AuthorizationData) {
-        headers["Authorization"] = "JWT \(authorizationData.token)"
+    private func updateHeaders(with token: String) {
+//        headers["Authorization"] = "JWT \(authorizationData.token)"
+        print("[log] token: \(token)")
+        headers["ascendontoken"] = token
+
+//        eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJFeHRlcm5hbEF1dGhvcml6YXRpb25zQ29udGV4dERhdGEiOiJBVVQiLCJTdWJzY3JpcHRpb25TdGF0dXMiOiJhY3RpdmUiLCJTdWJzY3JpYmVySWQiOiIzNTg2NTAyMyIsIkZpcnN0TmFtZSI6IkRhdmlkIiwiTGFzdE5hbWUiOiJTdGVpbmFjaGVyIiwiZXhwIjoxNjIwMjgzNzMzLCJTZXNzaW9uSWQiOiJleUowZVhBaU9pSktWMVFpTENKaGJHY2lPaUpJVXpJMU5pSjkuZXlKemFTSTZJall3WVRsaFpEZzBMV1U1TTJRdE5EZ3daaTA0TUdRMkxXRm1NemMwT1RSbU1tVXlNaUlzSW1KMUlqb2lNVEF3TVRFaUxDSnBaQ0k2SWpCa05HRTNOREU1TFdKa04yRXROR0ZrTWkxaVl6RTJMV00zTVRsak1XWmtaak0yTlNJc0ltd2lPaUpsYmkxSFFpSXNJbVJqSWpvaU1TSXNJblFpT2lJeElpd2lZV1ZrSWpvaU1qQXlNUzB3TlMwd05sUXdOam8wT0RvMU1pNDVNRFZhSWl3aVpXUWlPaUl5TURJeExUQTFMVEl5VkRBMk9qUTRPalV5TGprd05Wb2lMQ0pqWldRaU9pSXlNREl4TFRBMExUSXpWREEyT2pRNE9qVXlMamt3TlZvaUxDSnVZVzFsYVdRaU9pSXpOVGcyTlRBeU15SXNJbVIwSWpvaU1UQWlMQ0p3WkdraU9pSXpNell3TkRRek1pSXNJbWx3SWpvaU5EWXVNVEkwTGpFeE1pNHlPU0lzSW1Odklqb2lRVlZVSWl3aWJHRjBJam9pTkRndU1qQXhOeUlzSW14dmJtY2lPaUl4Tmk0ek9URTJJaXdpWXlJNklreEJUa1JUVkZKQlUxTkZJaXdpY0dNaU9pSXhNRE13SWl3aWFYTnpJam9pWVhOalpXNWtiMjR1ZEhZaUxDSmhkV1FpT2lKaGMyTmxibVJ2Ymk1MGRpSXNJbVY0Y0NJNk1UWXlNVFkyTmpFek1pd2libUptSWpveE5qRTVNRGMwTVRNeWZRLngwd0pmaE1ZWWZJMDhhVjRUNzRxUWdlaEd6SW5WUlpZSnBUZUo2N1dMRXMiLCJpYXQiOjE2MTkwNzQxMzMsIlN1YnNjcmliZWRQcm9kdWN0IjoiRjEgVFYgUHJvIE1vbnRobHkiLCJqdGkiOiI4ZjIxOTM5My1kZjBhLTRjMzgtOWQ0Yy04NzY0ZTg3MDM1ZDUifQ.ttjZ_VLgZKcaV7nfrEDgmJ_dX5pxWvO8rv9U0NTL4MwdqIP0IavQQF3lReQyzZR0qKVDv45ikBL8Z0x5xiqf3CyvSJFm8LaYqqLfnEt3tUUry10E1ZHMP9BqzJ1u3AX2Rr8IkiXG6jrKxHP2Ho7kAjBdKyCVR0Okc1ZMkpZxf74n4gfuNnMS0iBttkKGBTumsFAmzOZ8mF9B-t0kwtE_eLhK3xSuc3RKkuMz5CNYlRyKPeSTHQ-g_kfTQi68fi3NFs8K3QI6wxrmWo5uLm3FaSiO9EG4mgjJuNr549iWc-1IdBgtCPA4IQyqGmN-NGWLsTmLW8hZ_jxbh4g4hL0LAg
+//        eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6bnVsbCwiaWQiOjM3MzgyNjE0LCJleHAiOjE2MjA1NzU5MjIsInVnIjoiQVVUIn0.DmaVGfa1gg9WWg2_PTpY8Nn7ktevG1U-HDaOQ-WIMIc
     }
 
     // MARK: - Endpoints
@@ -448,6 +473,9 @@ struct Event: Codable, Hashable {
     let sessions: [Session]?
     let nation: Nation?
 
+    // v2 only
+    let meetingKey: String?
+
     init(
         pageId: Int? = nil,
         URL: String? = nil,
@@ -457,7 +485,8 @@ struct Event: Codable, Hashable {
         endDate: String,
         officialName: String,
         sessions: [Session]? = nil,
-        nation: Nation? = nil
+        nation: Nation? = nil,
+        meetingKey: String? = nil
     ) {
         self.pageId = pageId
         self.URL = URL
@@ -468,6 +497,7 @@ struct Event: Codable, Hashable {
         self.officialName = officialName
         self.sessions = sessions
         self.nation = nation
+        self.meetingKey = meetingKey
     }
 
     enum CodingKeys: String, CodingKey {
@@ -480,6 +510,7 @@ struct Event: Codable, Hashable {
         case officialName = "official_name"
         case sessions = "sessionoccurrence_urls"
         case nation = "nation_url"
+        case meetingKey
     }
 
     var sessionNamePrefix: String? {
@@ -499,18 +530,22 @@ struct Session: Codable, Hashable {
 
     let URL: String
     let name: String
-    let startTime: String
+//    let startTime: String
     let imageURLs: [Image]
-    let available: Bool
-    let contentURLs: [String]
+//    let available: Bool
+//    let contentURLs: [String]
+
+    // v2 only
+    let contentId: String?
 
     enum CodingKeys: String, CodingKey {
         case URL = "self"
         case name = "session_name"
-        case startTime = "start_time"
+//        case startTime = "start_time"
         case imageURLs = "image_urls"
-        case available = "available_for_user"
-        case contentURLs = "content_urls"
+        case contentId
+//        case available = "available_for_user"
+//        case contentURLs = "content_urls"
     }
 
 }
