@@ -116,7 +116,22 @@ extension F1TV {
             }
     }
 
+    func getStream_v2(_ url: String, completion: ((URL) -> Void)? = nil) {
+        get(URL(string: url)!, parameters: nil)
+            .responseDecodable(of: F1TVManifestResponse.self) { response in
+                guard let data = response.value else {
+                    print("[Error] error fetching manifest")
+                    return
+                }
 
+                guard let manifestUrlString = data.resultObj.url,
+                    let manifestUrl = URL(string: manifestUrlString) else {
+                    print("[Error] stream url missing")
+                    return
+                }
+
+                completion?(manifestUrl)
+            }
     }
 
     /// Returns a currently live session (Not the current race weekend)
