@@ -41,6 +41,7 @@ struct F1ApiFluffyMetadata: Codable {
 // MARK: - F1ApiEmfAttributes
 struct F1ApiEmfAttributes: Codable {
     let pageID: Int?
+    let meetingKey: String?
     let meetingName: String?
     let meetingStartDate: String?
     let meetingEndDate: String?
@@ -48,6 +49,7 @@ struct F1ApiEmfAttributes: Codable {
 
     enum CodingKeys: String, CodingKey {
         case pageID = "PageID"
+        case meetingKey = "MeetingKey"
         case meetingName = "Meeting_Name"
         case meetingStartDate = "Meeting_Start_Date"
         case meetingEndDate = "Meeting_End_Date"

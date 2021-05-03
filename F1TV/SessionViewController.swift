@@ -16,6 +16,8 @@ fileprivate let DriverCellIdentifier = "DriverCellIdentifier"
 
 class SessionViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
 
+    var player: AVPlayer!
+
     let session: Session
     private(set) var channels: [Channel]?
 
@@ -73,8 +75,8 @@ class SessionViewController: UIViewController, UICollectionViewDataSource, UICol
         raceView.imageView.sd_imageTransition = .fade
         raceView.contentSize = CGSize(width: 420.0, height: 420.0 * (9.0 / 16.0))
         raceView.title = "Main Stream"
-        raceView.isUserInteractionEnabled = false
-        raceView.alpha = 0.5
+        raceView.isUserInteractionEnabled = true
+        raceView.alpha = 1
         raceView.addTarget(self, action: #selector(openPrimaryRaceStream(_:)), for: [.touchUpInside, .primaryActionTriggered])
         view.addSubview(raceView)
 
@@ -127,17 +129,23 @@ class SessionViewController: UIViewController, UICollectionViewDataSource, UICol
     }
 
     private func loadEvent() {
-        activityIndicator.startAnimating()
-        F1TV.shared.getEpisodesForSession(session.URL) { [weak self] channels in
-            self?.activityIndicator.stopAnimating()
+        // TODO: load additional_streams
+//        activityIndicator.startAnimating()
+//        F1TV.shared.getStream_v2(session.URL) { [weak self] _ in
+//            self?.activityIndicator.stopAnimating()
+//        }
 
-            guard let channels = channels else {
-                return
-            }
-
-            self?.raceChannel = channels.first { $0.channelType == "wif" }
-            self?.driverChannels = channels.filter { $0.channelType == "driver" }
-        }
+//
+//        F1TV.shared.getEpisodesForSession(session.URL) { [weak self] channels in
+//
+//
+//            guard let channels = channels else {
+//                return
+//            }
+//
+//            self?.raceChannel = channels.first { $0.channelType == "wif" }
+//            self?.driverChannels = channels.filter { $0.channelType == "driver" }
+//        }
     }
 
     // MARK: - UICollectionViewDataSource
@@ -177,7 +185,7 @@ class SessionViewController: UIViewController, UICollectionViewDataSource, UICol
     }
 
     private func openStream(_ urlString: String, sender: UIView?) {
-        F1TV.shared.getStream(urlString) { [weak self] assetURL in
+        F1TV.shared.getStream_v2(urlString) { [weak self] assetURL in
             sender?.isUserInteractionEnabled = true
 
             guard let assetURL = assetURL else { return }
@@ -193,12 +201,14 @@ class SessionViewController: UIViewController, UICollectionViewDataSource, UICol
     }
 
     @objc private func openPrimaryRaceStream(_ sender: UIView?) {
-        guard let contentURL = raceChannel?.URL else {
-            return
-        }
+        // TODO: no URL as it seems
+//        guard let contentURL = session.URL else {
+//            print("[Error] No Channel URL")
+//            return
+//        }
 
         sender?.isUserInteractionEnabled = false
-        openStream(contentURL, sender: sender)
+        openStream(session.URL, sender: sender)
     }
 
 }

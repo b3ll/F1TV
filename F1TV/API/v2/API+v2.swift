@@ -11,15 +11,16 @@ struct F1TVEndpointV2 {
         case imageResizer = "https://ott.formula1.com/image-resizer/image/"
     }
 
-    enum Page: Int {
+    enum Page: String {
         static let prefix = "PAGE/"
-        case main = 395
+        case main = "395"
+        case search = "SEARCH/VOD"
 
         var url: URL {
             return Self.url(pageId: rawValue)
         }
 
-        static func url(pageId: Int) -> URL {
+        static func url(pageId: String) -> URL {
             let pagePath = urlTemplate.replacingOccurrences(of: pagePlaceholder, with: "\(Self.prefix)\(pageId)")
             let path = "\(F1TVAPIv2BasePath)\(pagePath)"
 
@@ -56,11 +57,12 @@ extension F1TV {
                 pageId: activeRaceWeekend.pageId,
                 name: activeRaceWeekend.name,
                 imageURLs: [
-                    Image(URL: self.buildImageUrl(id: activeRaceWeekend.pictureId), title: "Unkonwn") // TODO: is this title used?
+                    Image(URL: buildImageUrl(id: activeRaceWeekend.pictureId), title: "Unkonwn") // TODO: is this title used?
                 ],
                 startDate: activeRaceWeekend.startDate,
                 endDate: activeRaceWeekend.endDate,
-                officialName: activeRaceWeekend.officialName
+                officialName: activeRaceWeekend.officialName,
+                meetingKey: activeRaceWeekend.meetingKey
             )
 
             completion?(event)
@@ -68,23 +70,53 @@ extension F1TV {
     }
 
     func getEvent_v2(_ event: Event, completion: ((Event?) -> Void)? = nil) {
-        guard let pageId = event.pageId else {
-            print("[Error] Event does not have a pageId")
+        guard let meetingKey = event.meetingKey else {
+            print("[Error] Event does not have a meetingKey")
             return
         }
 
-        get(F1TVEndpointV2.Page.url(pageId: pageId), parameters: nil)
+        let sessionFilterParams = [
+            "filter_objectSubtype": "Replay,LIVE_EVENT",
+            "orderBy": "session_index",
+            "sortOrder": "asc",
+            "filter_MeetingKey": meetingKey,
+            "filter_orderByFom": "Y",
+            "title": "Replays"
+        ]
+
+        print("url \(F1TVEndpointV2.Page.search.url)")
+        get(F1TVEndpointV2.Page.search.url, parameters: sessionFilterParams)
             .responseData { response in
                 print(response)
+
+                guard let data = response.data,
+                      let eventResponse = try? JSONDecoder().decode(F1ApiEventResponse.self, from: data) else {
+                    print("error")
+                    return
+                }
+
+                let sessions = eventResponse.resultObj?.containers?.map {
+                    buildSession(from: $0)
+                }
+
+                let newEvent = Event(
+                    pageId: event.pageId,
+                    URL: event.URL,
+                    name: event.name,
+                    imageURLs: event.imageURLs,
+                    startDate: event.startDate,
+                    endDate: event.endDate,
+                    officialName: event.officialName,
+                    sessions: sessions,
+                    nation: nil,
+                    meetingKey: event.meetingKey
+                )
+
+                completion?(newEvent)
             }
     }
 
-    private func buildImageUrl(id: String) -> URL {
-        let imageWidth = 1280
-        let imageHeight = 720
 
-        // TODO: use URL builder
-        return URL(string: "\(F1TVEndpointV2.Helper.imageResizer.rawValue)\(id)?w=\(imageWidth)&h=\(imageHeight)")!
     }
 
     /// Returns a currently live session (Not the current race weekend)
@@ -225,10 +257,6 @@ extension F1TV {
 }
 
 // MARK: - helpers
-private func hasActiveRaceWeekend(mainPage: F1ApiMainPage) -> Bool {
-    return getActiveRaceWeekend(from: mainPage) != nil
-}
-
 private func getActiveRaceWeekend(from mainPage: F1ApiMainPage) -> ActiveRaceWeekend? {
     guard let raceWeekendContainer = mainPage.resultObj.containers.first(where: { $0.layout == "gp_banner"}) else {
         return nil
@@ -242,6 +270,27 @@ private func getActiveRaceWeekend(from mainPage: F1ApiMainPage) -> ActiveRaceWee
     return ActiveRaceWeekend(from: metadata)
 }
 
+private func buildSession(from eventContainer: F1ApiContainer) -> Session {
+    let mainChannelUrl = "https://f1tv.formula1.com/1.0/R/ENG/BIG_SCREEN_HLS/ALL/CONTENT/PLAY?contentId=\(eventContainer.id)"
+
+    return Session(
+        URL: mainChannelUrl,
+        name: eventContainer.metadata!.longDescription!,
+        imageURLs: [
+            Image(URL: buildImageUrl(id: eventContainer.metadata!.pictureUrl!), title: "Unkonwn")
+        ],
+        contentId: eventContainer.id
+    )
+}
+
+private func buildImageUrl(id: String) -> URL {
+    let imageWidth = 1280
+    let imageHeight = 720
+
+    // TODO: use URL builder
+    return URL(string: "\(F1TVEndpointV2.Helper.imageResizer.rawValue)\(id)?w=\(imageWidth)&h=\(imageHeight)")!
+}
+
 // MARK: - ViewModels
 struct ActiveRaceWeekend {
     let pageId: Int
@@ -251,6 +300,7 @@ struct ActiveRaceWeekend {
     let officialName: String
     let pictureId: String
     let season: Int?
+    let meetingKey: String?
 
     init(from metadata: F1ApiFluffyMetadata) {
         // TODO: improve optional handling
@@ -261,5 +311,6 @@ struct ActiveRaceWeekend {
         self.officialName = metadata.emfAttributes.meetingOfficialName!
         self.pictureId = metadata.pictureUrl!
         self.season = metadata.season
+        self.meetingKey = metadata.emfAttributes.meetingKey
     }
 }
