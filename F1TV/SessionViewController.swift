@@ -16,8 +16,6 @@ fileprivate let DriverCellIdentifier = "DriverCellIdentifier"
 
 class SessionViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
 
-    var player: AVPlayer!
-
     let session: Session
     private(set) var channels: [Channel]?
 
@@ -188,9 +186,18 @@ class SessionViewController: UIViewController, UICollectionViewDataSource, UICol
         F1TV.shared.getStream_v2(urlString) { [weak self] assetURL in
             sender?.isUserInteractionEnabled = true
 
-            guard let assetURL = assetURL else { return }
+            print("[Info] manifestUrl: \(assetURL.absoluteString)")
 
-            let player = AVPlayer(url: assetURL)
+            let avPlayerItem = AVPlayerItem(url: assetURL)
+            let player = AVPlayer(playerItem: avPlayerItem)
+
+            // working around a player issue where the stream can't be played when
+            // subtitles are selected initially
+            if let group = avPlayerItem.asset.mediaSelectionGroup(forMediaCharacteristic: .legible) {
+                avPlayerItem.select(nil, in: group)
+            } else {
+                print("[Warning] No .legible group found - Playback issues may occur")
+            }
 
             let streamViewController = AVPlayerViewController()
             streamViewController.player = player
