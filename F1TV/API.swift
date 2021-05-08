@@ -108,9 +108,6 @@ class F1TV {
             print("[log] login completed")
             self?.updateHeaders(with: session!.subscriptionData!.subscriptionToken)
             completion(true)
-//            self?._authorize(subscriptionData: subscriptionData) { (authorized) in
-//                completion(authorized)
-//            }
         }
     }
 
@@ -183,9 +180,6 @@ class F1TV {
 //        headers["Authorization"] = "JWT \(authorizationData.token)"
         print("[log] token: \(token)")
         headers["ascendontoken"] = token
-
-//        eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJFeHRlcm5hbEF1dGhvcml6YXRpb25zQ29udGV4dERhdGEiOiJBVVQiLCJTdWJzY3JpcHRpb25TdGF0dXMiOiJhY3RpdmUiLCJTdWJzY3JpYmVySWQiOiIzNTg2NTAyMyIsIkZpcnN0TmFtZSI6IkRhdmlkIiwiTGFzdE5hbWUiOiJTdGVpbmFjaGVyIiwiZXhwIjoxNjIwMjgzNzMzLCJTZXNzaW9uSWQiOiJleUowZVhBaU9pSktWMVFpTENKaGJHY2lPaUpJVXpJMU5pSjkuZXlKemFTSTZJall3WVRsaFpEZzBMV1U1TTJRdE5EZ3daaTA0TUdRMkxXRm1NemMwT1RSbU1tVXlNaUlzSW1KMUlqb2lNVEF3TVRFaUxDSnBaQ0k2SWpCa05HRTNOREU1TFdKa04yRXROR0ZrTWkxaVl6RTJMV00zTVRsak1XWmtaak0yTlNJc0ltd2lPaUpsYmkxSFFpSXNJbVJqSWpvaU1TSXNJblFpT2lJeElpd2lZV1ZrSWpvaU1qQXlNUzB3TlMwd05sUXdOam8wT0RvMU1pNDVNRFZhSWl3aVpXUWlPaUl5TURJeExUQTFMVEl5VkRBMk9qUTRPalV5TGprd05Wb2lMQ0pqWldRaU9pSXlNREl4TFRBMExUSXpWREEyT2pRNE9qVXlMamt3TlZvaUxDSnVZVzFsYVdRaU9pSXpOVGcyTlRBeU15SXNJbVIwSWpvaU1UQWlMQ0p3WkdraU9pSXpNell3TkRRek1pSXNJbWx3SWpvaU5EWXVNVEkwTGpFeE1pNHlPU0lzSW1Odklqb2lRVlZVSWl3aWJHRjBJam9pTkRndU1qQXhOeUlzSW14dmJtY2lPaUl4Tmk0ek9URTJJaXdpWXlJNklreEJUa1JUVkZKQlUxTkZJaXdpY0dNaU9pSXhNRE13SWl3aWFYTnpJam9pWVhOalpXNWtiMjR1ZEhZaUxDSmhkV1FpT2lKaGMyTmxibVJ2Ymk1MGRpSXNJbVY0Y0NJNk1UWXlNVFkyTmpFek1pd2libUptSWpveE5qRTVNRGMwTVRNeWZRLngwd0pmaE1ZWWZJMDhhVjRUNzRxUWdlaEd6SW5WUlpZSnBUZUo2N1dMRXMiLCJpYXQiOjE2MTkwNzQxMzMsIlN1YnNjcmliZWRQcm9kdWN0IjoiRjEgVFYgUHJvIE1vbnRobHkiLCJqdGkiOiI4ZjIxOTM5My1kZjBhLTRjMzgtOWQ0Yy04NzY0ZTg3MDM1ZDUifQ.ttjZ_VLgZKcaV7nfrEDgmJ_dX5pxWvO8rv9U0NTL4MwdqIP0IavQQF3lReQyzZR0qKVDv45ikBL8Z0x5xiqf3CyvSJFm8LaYqqLfnEt3tUUry10E1ZHMP9BqzJ1u3AX2Rr8IkiXG6jrKxHP2Ho7kAjBdKyCVR0Okc1ZMkpZxf74n4gfuNnMS0iBttkKGBTumsFAmzOZ8mF9B-t0kwtE_eLhK3xSuc3RKkuMz5CNYlRyKPeSTHQ-g_kfTQi68fi3NFs8K3QI6wxrmWo5uLm3FaSiO9EG4mgjJuNr549iWc-1IdBgtCPA4IQyqGmN-NGWLsTmLW8hZ_jxbh4g4hL0LAg
-//        eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6bnVsbCwiaWQiOjM3MzgyNjE0LCJleHAiOjE2MjA1NzU5MjIsInVnIjoiQVVUIn0.DmaVGfa1gg9WWg2_PTpY8Nn7ktevG1U-HDaOQ-WIMIc
     }
 
     // MARK: - Endpoints
