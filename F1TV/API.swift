@@ -107,6 +107,7 @@ class F1TV {
 
             print("[log] login completed")
             self?.updateHeaders(with: session!.subscriptionData!.subscriptionToken)
+            completion(true)
 //            self?._authorize(subscriptionData: subscriptionData) { (authorized) in
 //                completion(authorized)
 //            }
