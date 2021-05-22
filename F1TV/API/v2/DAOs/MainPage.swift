@@ -33,7 +33,7 @@ struct F1ApiFluffyContainer: Codable {
 
 // MARK: - F1ApiFluffyMetadata
 struct F1ApiFluffyMetadata: Codable {
-    let emfAttributes: F1ApiEmfAttributes
+    let emfAttributes: F1ApiEmfAttributes?
     let pictureUrl: String?
     let season: Int?
 }

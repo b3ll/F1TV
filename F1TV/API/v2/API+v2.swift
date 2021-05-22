@@ -236,15 +236,19 @@ struct ActiveRaceWeekend {
     let season: Int?
     let meetingKey: String?
 
-    init(from metadata: F1ApiFluffyMetadata) {
+    init?(from metadata: F1ApiFluffyMetadata) {
         // TODO: improve optional handling
-        self.pageId = metadata.emfAttributes.pageID!
-        self.name = metadata.emfAttributes.meetingName!
-        self.startDate = metadata.emfAttributes.meetingStartDate!
-        self.endDate = metadata.emfAttributes.meetingEndDate!
-        self.officialName = metadata.emfAttributes.meetingOfficialName!
+        guard let attributes = metadata.emfAttributes else {
+            return nil
+        }
+
+        self.pageId = attributes.pageID!
+        self.name = attributes.meetingName!
+        self.startDate = attributes.meetingStartDate!
+        self.endDate = attributes.meetingEndDate!
+        self.officialName = attributes.meetingOfficialName!
         self.pictureId = metadata.pictureUrl!
         self.season = metadata.season
-        self.meetingKey = metadata.emfAttributes.meetingKey
+        self.meetingKey = attributes.meetingKey
     }
 }
