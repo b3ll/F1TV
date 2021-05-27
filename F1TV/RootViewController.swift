@@ -119,7 +119,7 @@ class RootViewController: UINavigationController {
             weekendGrandPrixEventViewController = nil
         }
 
-        F1TV.shared.getRaceWeekend() { [weak self] event in
+        F1TV.shared.getRaceWeekend_v2() { [weak self] event in
             if let event = event {
                 let eventViewController = EventViewController(partialEvent: event)
                 eventViewController.tabBarItem = UITabBarItem(title: event.name, image: nil, selectedImage: nil)

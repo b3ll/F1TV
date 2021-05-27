@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		37A05E5D263EB39F005A2580 /* API+v2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A05E5C263EB39F005A2580 /* API+v2.swift */; };
+		37A05E63263EB7AB005A2580 /* MainPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A05E62263EB7AB005A2580 /* MainPage.swift */; };
+		37F9C9BE263EDBAA002A1953 /* EventPageResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F9C9BD263EDBAA002A1953 /* EventPageResponse.swift */; };
+		37F9C9C1264059FC002A1953 /* ManifestResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F9C9C0264059FC002A1953 /* ManifestResponse.swift */; };
 		663B305125212C9300D405AF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663B305025212C9300D405AF /* AppDelegate.swift */; };
 		663B305825212C9500D405AF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 663B305725212C9500D405AF /* Assets.xcassets */; };
 		663B305B25212C9500D405AF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 663B305925212C9500D405AF /* LaunchScreen.storyboard */; };
@@ -26,6 +30,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		37A05E5C263EB39F005A2580 /* API+v2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API+v2.swift"; sourceTree = "<group>"; };
+		37A05E62263EB7AB005A2580 /* MainPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainPage.swift; sourceTree = "<group>"; };
+		37F9C9BD263EDBAA002A1953 /* EventPageResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventPageResponse.swift; sourceTree = "<group>"; };
+		37F9C9C0264059FC002A1953 /* ManifestResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManifestResponse.swift; sourceTree = "<group>"; };
 		663B304D25212C9300D405AF /* F1TV.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = F1TV.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		663B305025212C9300D405AF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		663B305725212C9500D405AF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -57,6 +65,33 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		37A05E5B263EB38D005A2580 /* API */ = {
+			isa = PBXGroup;
+			children = (
+				37A05E60263EB799005A2580 /* v2 */,
+			);
+			path = API;
+			sourceTree = "<group>";
+		};
+		37A05E60263EB799005A2580 /* v2 */ = {
+			isa = PBXGroup;
+			children = (
+				37A05E61263EB7A0005A2580 /* DAOs */,
+				37A05E5C263EB39F005A2580 /* API+v2.swift */,
+			);
+			path = v2;
+			sourceTree = "<group>";
+		};
+		37A05E61263EB7A0005A2580 /* DAOs */ = {
+			isa = PBXGroup;
+			children = (
+				37A05E62263EB7AB005A2580 /* MainPage.swift */,
+				37F9C9BD263EDBAA002A1953 /* EventPageResponse.swift */,
+				37F9C9C0264059FC002A1953 /* ManifestResponse.swift */,
+			);
+			path = DAOs;
+			sourceTree = "<group>";
+		};
 		6609DBE7252AE6E800E58D2C /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
@@ -92,6 +127,7 @@
 		663B304F25212C9300D405AF /* F1TV */ = {
 			isa = PBXGroup;
 			children = (
+				37A05E5B263EB38D005A2580 /* API */,
 				66D7BF8025230F3600DB4AB2 /* italygrandprix.jpg */,
 				663B305025212C9300D405AF /* AppDelegate.swift */,
 				66BC9BE42532C9B20054269C /* LoginManager.swift */,
@@ -193,10 +229,14 @@
 			files = (
 				66D7BF7425230AF100DB4AB2 /* SeasonViewController.swift in Sources */,
 				66BC9BE52532C9B20054269C /* LoginManager.swift in Sources */,
+				37A05E5D263EB39F005A2580 /* API+v2.swift in Sources */,
+				37F9C9C1264059FC002A1953 /* ManifestResponse.swift in Sources */,
+				37A05E63263EB7AB005A2580 /* MainPage.swift in Sources */,
 				66BC9BE82532D05D0054269C /* RootViewController.swift in Sources */,
 				66D7BF7725230C6800DB4AB2 /* CircuitView.swift in Sources */,
 				663B306625212CE100D405AF /* API.swift in Sources */,
 				66BC9BDA2532C4120054269C /* PlaceholderImage.swift in Sources */,
+				37F9C9BE263EDBAA002A1953 /* EventPageResponse.swift in Sources */,
 				663B305125212C9300D405AF /* AppDelegate.swift in Sources */,
 				669E894A2525B1D600C1C7A9 /* SessionViewController.swift in Sources */,
 				669E894725259B3300C1C7A9 /* EventViewController.swift in Sources */,

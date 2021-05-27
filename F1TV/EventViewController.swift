@@ -61,8 +61,14 @@ class EventViewController: UIViewController, UICollectionViewDataSource, UIColle
     }
 
     private func loadEvent() {
-        F1TV.shared.getEvent(partialEvent.URL) { [weak self] event in
-            self?.event = event
+        if let v1ApiUrl = partialEvent.URL {
+            F1TV.shared.getEvent(v1ApiUrl) { [weak self] event in
+                self?.event = event
+            }
+        } else if let _ = partialEvent.pageId {
+            F1TV.shared.getEvent_v2(partialEvent) { [weak self] event in
+                self?.event = event
+            }
         }
     }
 

@@ -89,6 +89,7 @@ class F1TV {
         "cd-systemid": systemId,
         "User-Agent": "RaceControl",
         "accept-language": "en",
+        "Last-Modified": ""
     ]
 
     // MARK: - Login
@@ -104,18 +105,36 @@ class F1TV {
                 return
             }
 
-            self?._authorize(subscriptionData: subscriptionData) { (authorized) in
-                completion(authorized)
-            }
+            print("[log] login completed")
+            self?.updateHeaders(with: session!.subscriptionData!.subscriptionToken)
+            completion(true)
         }
     }
 
     private func _login(username: String, password: String, completion: ((AccountSession?) -> Void)? ) {
-        let login = ["Login": username,
-                     "Password": password]
-        AF.request(accountCreateSession, method: .post, parameters: login, encoder: JSONParameterEncoder.default, headers: HTTPHeaders(headers)).responseData { (response) in
+        let login = [
+            "DeviceType": "16",
+            "DistributionChannel": "871435e3-2d31-4d4f-9004-96c6a8011656",
+            "Language": "en-GB",
+            "Login": username,
+            "Password": password
+        ]
+        let authHeaders = [
+             "Content-Type": "application/json",
+             "apikey": apiKey,
+             "CD-DeviceType": "16",
+             "CD-DistributionChannel": "871435e3-2d31-4d4f-9004-96c6a8011656",
+             "User-Agent": "RaceControl"
+        ]
+        AF.request(
+            accountCreateSession,
+            method: .post,
+            parameters: login,
+            encoder: JSONParameterEncoder.default,
+            headers: HTTPHeaders(authHeaders)
+        ).responseData { (response) in
             guard let data = response.data else {
-                print("login failed")
+                print("[Error] login failed")
                 completion?(nil)
                 return
             }
@@ -131,34 +150,36 @@ class F1TV {
         }
     }
 
-    private func _authorize(subscriptionData: SubscriptionData, completion: ((Bool) -> Void)?) {
-        let params = ["identity_provider_url": identityProvider,
-                      "access_token": subscriptionData.subscriptionToken]
-        AF.request(socialAuthenticate, method: .post, parameters: params, encoder: JSONParameterEncoder.default, headers: HTTPHeaders(headers)).responseData { [weak self] (response) in
-            guard let data = response.data else {
-                print("authorization failed")
-                completion?(false)
-                return
-            }
-
-            let decoder = JSONDecoder()
-            do {
-                let authorization = try decoder.decode(AuthorizationData.self, from: data)
-                self?.updateHeaders(with: authorization)
-                completion?(true)
-            } catch {
-                print(error)
-                completion?(false)
-            }
-        }
-    }
+//    private func _authorize(subscriptionData: SubscriptionData, completion: ((Bool) -> Void)?) {
+//        let params = ["identity_provider_url": identityProvider,
+//                      "access_token": subscriptionData.subscriptionToken]
+//        AF.request(socialAuthenticate, method: .post, parameters: params, encoder: JSONParameterEncoder.default, headers: HTTPHeaders(headers)).responseData { [weak self] (response) in
+//            guard let data = response.data else {
+//                print("authorization failed")
+//                completion?(false)
+//                return
+//            }
+//
+//            let decoder = JSONDecoder()
+//            do {
+//                let authorization = try decoder.decode(AuthorizationData.self, from: data)
+//                self?.updateHeaders(with: authorization)
+//                completion?(true)
+//            } catch {
+//                print(error)
+//                completion?(false)
+//            }
+//        }
+//    }
 
     var loggedInAndAuthorized: Bool {
         return headers["Authorization"] != nil
     }
 
-    private func updateHeaders(with authorizationData: AuthorizationData) {
-        headers["Authorization"] = "JWT \(authorizationData.token)"
+    private func updateHeaders(with token: String) {
+//        headers["Authorization"] = "JWT \(authorizationData.token)"
+        print("[log] token: \(token)")
+        headers["ascendontoken"] = token
     }
 
     // MARK: - Endpoints
@@ -348,11 +369,11 @@ class F1TV {
         //            }
     }
 
-    private func get(_ URL: URL, parameters: [String: String]?) -> some DataRequest {
+    func get(_ URL: URL, parameters: [String: String]?) -> some DataRequest {
         return AF.request(URL, method: .get, parameters: parameters, encoder: URLEncodedFormParameterEncoder.default, headers: HTTPHeaders(headers))
     }
 
-    private func post(_ URL: URL, parameters: [String: String]?) -> some DataRequest {
+    func post(_ URL: URL, parameters: [String: String]?) -> some DataRequest {
         return AF.request(URL, method: .post, parameters: parameters, encoder: JSONParameterEncoder.default, headers: HTTPHeaders(headers))
     }
 
@@ -431,9 +452,14 @@ struct SeasonsResponse: Codable {
 
 }
 
+// TODO: split ViewModels and DAOs for v1 and v2 API
 struct Event: Codable, Hashable {
 
-    let URL: String
+    // TODO: Streamline this once fully switching to one API version.
+    //       If the pageId is set it's using the v2 API and if the URL is present it should go to the v1 API.
+    let pageId: Int?
+    let URL: String?
+
     let name: String
     let imageURLs: [Image]
     let startDate: String
@@ -442,7 +468,35 @@ struct Event: Codable, Hashable {
     let sessions: [Session]?
     let nation: Nation?
 
+    // v2 only
+    let meetingKey: String?
+
+    init(
+        pageId: Int? = nil,
+        URL: String? = nil,
+        name: String,
+        imageURLs: [Image],
+        startDate: String,
+        endDate: String,
+        officialName: String,
+        sessions: [Session]? = nil,
+        nation: Nation? = nil,
+        meetingKey: String? = nil
+    ) {
+        self.pageId = pageId
+        self.URL = URL
+        self.name = name
+        self.imageURLs = imageURLs
+        self.startDate = startDate
+        self.endDate = endDate
+        self.officialName = officialName
+        self.sessions = sessions
+        self.nation = nation
+        self.meetingKey = meetingKey
+    }
+
     enum CodingKeys: String, CodingKey {
+        case pageId
         case name
         case URL = "self"
         case imageURLs = "image_urls"
@@ -451,6 +505,7 @@ struct Event: Codable, Hashable {
         case officialName = "official_name"
         case sessions = "sessionoccurrence_urls"
         case nation = "nation_url"
+        case meetingKey
     }
 
     var sessionNamePrefix: String? {
@@ -470,18 +525,22 @@ struct Session: Codable, Hashable {
 
     let URL: String
     let name: String
-    let startTime: String
+//    let startTime: String
     let imageURLs: [Image]
-    let available: Bool
-    let contentURLs: [String]
+//    let available: Bool
+//    let contentURLs: [String]
+
+    // v2 only
+    let contentId: String?
 
     enum CodingKeys: String, CodingKey {
         case URL = "self"
         case name = "session_name"
-        case startTime = "start_time"
+//        case startTime = "start_time"
         case imageURLs = "image_urls"
-        case available = "available_for_user"
-        case contentURLs = "content_urls"
+        case contentId
+//        case available = "available_for_user"
+//        case contentURLs = "content_urls"
     }
 
 }
