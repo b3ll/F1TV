@@ -29,6 +29,7 @@ struct F1ApiRetrieveItemsResultObj: Codable {
 // MARK: - F1ApiFluffyContainer
 struct F1ApiFluffyContainer: Codable {
     let metadata: F1ApiFluffyMetadata
+    let id: String
 }
 
 // MARK: - F1ApiFluffyMetadata

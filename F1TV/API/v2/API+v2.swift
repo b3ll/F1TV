@@ -54,7 +54,7 @@ extension F1TV {
             }
 
             let event = Event(
-                pageId: activeRaceWeekend.pageId,
+                pageId: activeRaceWeekend.pageId ?? activeRaceWeekend.id,
                 name: activeRaceWeekend.name,
                 imageURLs: [
                     Image(URL: buildImageUrl(id: activeRaceWeekend.pictureId), title: "Unkonwn") // TODO: is this title used?
@@ -192,7 +192,7 @@ extension F1TV {
 
 // MARK: - helpers
 private func getActiveRaceWeekend(from mainPage: F1ApiMainPage) -> ActiveRaceWeekend? {
-    guard let raceWeekendContainer = mainPage.resultObj.containers.first(where: { $0.layout == "gp_banner"}) else {
+    guard let raceWeekendContainer = mainPage.resultObj.containers.first(where: { $0.layout == "hero"}) else {
         return nil
     }
 
@@ -201,7 +201,7 @@ private func getActiveRaceWeekend(from mainPage: F1ApiMainPage) -> ActiveRaceWee
     }
 
     let metadata = innerContainer.metadata
-    return ActiveRaceWeekend(from: metadata)
+    return ActiveRaceWeekend(from: metadata, id: Int(innerContainer.id))
 }
 
 private func buildSession(from eventContainer: F1ApiContainer) -> Session {
@@ -221,13 +221,19 @@ private func buildImageUrl(id: String) -> URL {
     let imageWidth = 1280
     let imageHeight = 720
 
-    // TODO: use URL builder
-    return URL(string: "\(F1TVEndpointV2.Helper.imageResizer.rawValue)\(id)?w=\(imageWidth)&h=\(imageHeight)")!
+    var components = URLComponents(url: URL(string: F1TVEndpointV2.Helper.imageResizer.rawValue + id)!, resolvingAgainstBaseURL: true)!
+    components.queryItems = [
+        URLQueryItem(name: "w", value: "\(imageWidth)"),
+        URLQueryItem(name: "h", value: "\(imageHeight)"),
+    ]
+
+    return components.url!
 }
 
 // MARK: - ViewModels
 struct ActiveRaceWeekend {
-    let pageId: Int
+    let id: Int?
+    let pageId: Int?
     let name: String
     let startDate: String
     let endDate: String
@@ -236,13 +242,14 @@ struct ActiveRaceWeekend {
     let season: Int?
     let meetingKey: String?
 
-    init?(from metadata: F1ApiFluffyMetadata) {
+    init?(from metadata: F1ApiFluffyMetadata, id: Int?) {
         // TODO: improve optional handling
         guard let attributes = metadata.emfAttributes else {
             return nil
         }
 
-        self.pageId = attributes.pageID!
+        self.id = id
+        self.pageId = attributes.pageID
         self.name = attributes.meetingName!
         self.startDate = attributes.meetingStartDate!
         self.endDate = attributes.meetingEndDate!
