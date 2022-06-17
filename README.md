@@ -1,5 +1,8 @@
 # F1TV - A tvOS Client for F1TV
 
+> **Warning**
+> This project no longer works and is no longer maintained. The Official F1TV app works just fine for me :) 
+
 **Disclaimer**: This project is not officially commissioned / supported by F1TV or Formula One Group. F1TV is owned / trademarked by Formula One Group. I made it purely for fun, out of my own free time, and in no way intend for it to harm the Formula One brand. https://f1tv.formula1.com/en/
 
 - [F1TV - A tvOS Client for F1TV](#f1tv---a-tvos-client-for-f1tv)
